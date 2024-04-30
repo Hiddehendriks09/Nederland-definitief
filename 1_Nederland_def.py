@@ -18,7 +18,7 @@ def process_files(main_file, reference_file, start_date, end_date):
     
     # Filling missing data
     data['Fulfilled at'] = data['Fulfilled at'].ffill()
-    data['Shipping Country'] = data['Shipping Country'].ffill()
+    data['Billing Country'] = data['Billing Country'].ffill()
     data['Billing Name'] = data['Billing Name'].ffill()
     data['Billing Street'] = data['Billing Street'].ffill()
     
