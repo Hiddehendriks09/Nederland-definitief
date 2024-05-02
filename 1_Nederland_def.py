@@ -12,7 +12,7 @@ def process_files(main_file, reference_file, start_date, end_date):
     
     # Load reference data file
     check = pd.read_csv(reference_file)
-    
+    check = check.drop_duplicates()
     # Merging data with reference data
     data = pd.merge(data, check[['SKU', 'Alcohol Percentage']], on='SKU', how='left')
     
@@ -24,9 +24,9 @@ def process_files(main_file, reference_file, start_date, end_date):
     
     # Filtering data for specific conditions
     df = data[data['Billing Country'] != 'NL']
-    selected_columns = ["Name", "Created at", "Fulfilled at", "Lineitem quantity", "Lineitem name", "Billing Name", "Billing Street", "Alcohol Percentage"]
+    selected_columns = ["Name", "Created at", "Fulfilled at", "Lineitem quantity", "Lineitem name", "Billing Name", "Billing Street", "Alcohol Percentage", "Billing Country"]
     new_df = df[selected_columns]
-    new_df = new_df.rename(columns={"Name": "Invoice/order", "Created at": "Invoice date", "Fulfilled at": "Delivery date","Lineitem name": "Product name", "Lineitem quantity": "Number of sold items", "Billing Name": "Name of client", "Billing Street": "Address details"  })
+    new_df = new_df.rename(columns={"Name": "Invoice/order", "Created at": "Invoice date", "Fulfilled at": "Delivery date","Lineitem name": "Product name", "Lineitem quantity": "Number of sold items", "Billing Name": "Name of client", "Billing Street": "Address details", "Billing Country": "Country"  })
     new_df['Invoice date'] = pd.to_datetime(new_df['Invoice date']).dt.tz_localize(None)
 # Format the 'Invoice date' column with the desired format
     #new_df['Invoice date'] = new_df['Invoice date'].dt.strftime('%Y-%m-%d %H:%M')
@@ -39,7 +39,7 @@ def process_files(main_file, reference_file, start_date, end_date):
     new_df["Total content"] = new_df["Content"]*new_df["Number of sold items"]
 
     filtered_df = new_df[(new_df['Delivery date'] >= start_date) & (new_df['Delivery date'] <= end_date)]
-    final_data = filtered_df[['Invoice/order', 'Invoice date', 'Delivery date', 'Name of client', 'Address details', 'Product name', 'Number of sold items', 'Content', 'Total content', 'Alcohol Percentage', 'Plato percentage']]
+    final_data = filtered_df[['Invoice/order', 'Invoice date', 'Delivery date', 'Name of client', 'Address details', 'Product name', 'Number of sold items', 'Content', 'Total content', 'Alcohol Percentage', 'Plato percentage', 'Country']]
     final_data = final_data.drop_duplicates()
 
     total_content_sum_lower = final_data[final_data['Alcohol Percentage'] <= 8.5]['Total content'].sum()
