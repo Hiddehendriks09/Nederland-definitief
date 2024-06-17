@@ -2,6 +2,11 @@ import streamlit as st
 import pandas as pd
 import io
 
+def clean_csv(file):
+    lines = file.getvalue().decode('utf-8').splitlines()
+    cleaned_lines = [line.strip().strip('"') for line in lines]
+    return "\n".join(cleaned_lines)
+    
 def process_files(main_file, reference_file, start_date, end_date):
     # Load main data file
     data = pd.read_csv(main_file)
@@ -11,7 +16,8 @@ def process_files(main_file, reference_file, start_date, end_date):
     data['SKU'] = data['SKU'].str.replace(r"(-\d+|[A-Z])$", "", regex=True)
     
     # Load reference data file
-    check = pd.read_csv(reference_file)
+    reference_file_content = clean_csv(reference_file)
+    check = pd.read_csv(io.StringIO(reference_file_content))
     check = check.drop_duplicates()
     # Merging data with reference data
     data = pd.merge(data, check[['SKU', 'Alcohol Percentage']], on='SKU', how='left')
