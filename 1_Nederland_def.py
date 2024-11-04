@@ -33,11 +33,11 @@ def process_files(main_file, reference_file, start_date, end_date):
     selected_columns = ["Name", "Created at", "Fulfilled at", "Lineitem quantity", "Lineitem name", "Billing Name", "Billing Street", "Alcohol Percentage", "Billing Country"]
     new_df = df[selected_columns]
     new_df = new_df.rename(columns={"Name": "Invoice/order", "Created at": "Invoice date", "Fulfilled at": "Delivery date","Lineitem name": "Product name", "Lineitem quantity": "Number of sold items", "Billing Name": "Name of client", "Billing Street": "Address details", "Billing Country": "Country"  })
-    new_df['Invoice date'] = pd.to_datetime(new_df['Invoice date']).dt.tz_localize(None)
+    new_df['Invoice date'] = pd.to_datetime(new_df['Invoice date'], errors='coerce').dt.tz_convert(None)
 # Format the 'Invoice date' column with the desired format
     #new_df['Invoice date'] = new_df['Invoice date'].dt.strftime('%Y-%m-%d %H:%M')
 # Repeat the same process for 'Delivery date' column if needed
-    new_df['Delivery date'] = pd.to_datetime(new_df['Delivery date']).dt.tz_localize(None)
+    new_df['Delivery date'] = pd.to_datetime(new_df['Delivery date'], errors='coerce').dt.tz_convert(None)
     #new_df['Delivery date'] = new_df['Delivery date'].dt.strftime('%Y-%m-%d %H:%M')
     new_df["Plato percentage"] = 0
 #new_df['Last Part'] = new_df['Product name'].str.split().str[-2:].str.join(' ')
