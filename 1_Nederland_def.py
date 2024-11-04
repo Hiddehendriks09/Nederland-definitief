@@ -34,17 +34,19 @@ def process_files(main_file, reference_file, start_date, end_date):
     new_df = df[selected_columns]
     new_df = new_df.rename(columns={"Name": "Invoice/order", "Created at": "Invoice date", "Fulfilled at": "Delivery date","Lineitem name": "Product name", "Lineitem quantity": "Number of sold items", "Billing Name": "Name of client", "Billing Street": "Address details", "Billing Country": "Country"  })
     
-        # Converteer datumkolommen met 'errors=coerce' en controleer op problemen
+    # Converteer kolommen naar datetime, met foutafhandeling
     new_df['Invoice date'] = pd.to_datetime(new_df['Invoice date'], errors='coerce')
     new_df['Delivery date'] = pd.to_datetime(new_df['Delivery date'], errors='coerce')
 
-    # Controleer of conversie naar datetime geslaagd is
+    # Controleer op niet-converteerbare waarden
     if new_df['Invoice date'].isnull().any() or new_df['Delivery date'].isnull().any():
-        st.write("Sommige datums konden niet worden geconverteerd en zijn nu NaT (Not a Time). Controleer de datums in de inputbestanden.")
-    
-    # Verwijder tijdzones indien aanwezig
-    new_df['Invoice date'] = new_df['Invoice date'].dt.tz_localize(None)
-    new_df['Delivery date'] = new_df['Delivery date'].dt.tz_localize(None)
+        st.write("Er zijn datums die niet konden worden geconverteerd en zijn omgezet naar NaT. Controleer de invoerdata.")
+        st.write("Niet-converteerbare datums in 'Invoice date':", new_df[new_df['Invoice date'].isnull()])
+        st.write("Niet-converteerbare datums in 'Delivery date':", new_df[new_df['Delivery date'].isnull()])
+
+    # Verwijder tijdzone (alleen als het datetime-waarden zijn)
+    new_df['Invoice date'] = new_df['Invoice date'].dropna().dt.tz_localize(None)
+    new_df['Delivery date'] = new_df['Delivery date'].dropna().dt.tz_localize(None)
     
     new_df["Plato percentage"] = 0
 #new_df['Last Part'] = new_df['Product name'].str.split().str[-2:].str.join(' ')
