@@ -34,22 +34,12 @@ def process_files(main_file, reference_file, start_date, end_date):
     new_df = df[selected_columns]
     new_df = new_df.rename(columns={"Name": "Invoice/order", "Created at": "Invoice date", "Fulfilled at": "Delivery date","Lineitem name": "Product name", "Lineitem quantity": "Number of sold items", "Billing Name": "Name of client", "Billing Street": "Address details", "Billing Country": "Country"  })
     
-    # Converteer kolommen naar datetime, met foutafhandeling
-    new_df['Invoice date'] = pd.to_datetime(new_df['Invoice date'], errors='coerce')
-    new_df['Delivery date'] = pd.to_datetime(new_df['Delivery date'], errors='coerce')
-
-    # Controleer op niet-converteerbare waarden
-    if new_df['Invoice date'].isnull().any() or new_df['Delivery date'].isnull().any():
-        st.write("Er zijn datums die niet konden worden geconverteerd en zijn omgezet naar NaT. Controleer de invoerdata.")
-        st.write("Niet-converteerbare datums in 'Invoice date':", new_df[new_df['Invoice date'].isnull()])
-        st.write("Niet-converteerbare datums in 'Delivery date':", new_df[new_df['Delivery date'].isnull()])
-
-    # Verwijder tijdzone (alleen als het datetime-waarden zijn)
-    new_df['Invoice date'] = new_df['Invoice date'].dropna().dt.tz_localize(None)
-    new_df['Delivery date'] = new_df['Delivery date'].dropna().dt.tz_localize(None)
+    # Remove timezone offset and then convert to datetime
+    new_df['Invoice date'] = pd.to_datetime(new_df['Invoice date'].str.slice(0, 19), errors='coerce')
+    new_df['Delivery date'] = pd.to_datetime(new_df['Delivery date'].str.slice(0, 19), errors='coerce')
     
     new_df["Plato percentage"] = 0
-#new_df['Last Part'] = new_df['Product name'].str.split().str[-2:].str.join(' ')
+    #new_df['Last Part'] = new_df['Product name'].str.split().str[-2:].str.join(' ')
     new_df['Content'] = new_df['Product name'].str.extract(r'(\d+)(?!.*\d)').astype(float).astype('Int64')
     new_df["Total content"] = new_df["Content"]*new_df["Number of sold items"]
 
