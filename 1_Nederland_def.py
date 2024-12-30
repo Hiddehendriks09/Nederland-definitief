@@ -29,7 +29,7 @@ def process_files(main_file, reference_file, start_date, end_date):
     data['Billing Street'] = data['Billing Street'].ffill()
     
     # Filtering data for specific conditions
-    df = data[data['Billing Country'] != 'NL']
+    df = data[~data['Billing Country'].isin(['NL', 'FR'])]
     selected_columns = ["Name", "Created at", "Fulfilled at", "Lineitem quantity", "Lineitem name", "Billing Name", "Billing Street", "Alcohol Percentage", "Billing Country"]
     new_df = df[selected_columns]
     new_df = new_df.rename(columns={"Name": "Invoice/order", "Created at": "Invoice date", "Fulfilled at": "Delivery date","Lineitem name": "Product name", "Lineitem quantity": "Number of sold items", "Billing Name": "Name of client", "Billing Street": "Address details", "Billing Country": "Country"  })
