@@ -47,17 +47,6 @@ def process_files(main_file, reference_file, start_date, end_date):
     final_data = filtered_df[['Invoice/order', 'Invoice date', 'Delivery date', 'Name of client', 'Address details', 'Product name', 'Number of sold items', 'Content', 'Total content', 'Alcohol Percentage', 'Plato percentage', 'Country']]
     final_data = final_data.drop_duplicates()
 
-    total_content_sum_lower = final_data[final_data['Alcohol Percentage'] <= 8.5]['Total content'].sum()
-    total_content_sum_higher = final_data[final_data['Alcohol Percentage'] > 8.5]['Total content'].sum()
-    
-    summary_df = pd.DataFrame({
-        'Invoice/order': ['Total Content <= 8.5%', 'Total Content > 8.5%'],
-        'Total Content': [total_content_sum_lower/1000, total_content_sum_higher/1000]
-    })
-    
-    # Concatenate summary rows at the top of the final DataFrame
-    final_data = pd.concat([final_data, summary_df], ignore_index=True)
-
     return final_data
 
 st.title('Accijnsaangifte Nederland')
@@ -96,4 +85,5 @@ if st.button('Download bestand'):
             st.error(f"Error in date format: {e}")
     else:
         st.error("Please upload both files and specify the date range to continue.")
+
 
